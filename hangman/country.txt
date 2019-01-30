@@ -1,0 +1,5 @@
+Australia::Hint::kangkaroo
+America::Hint::Donald Trump
+China::Hint::the most population
+England::Hint::London
+Thailand::Hint::Bangkok

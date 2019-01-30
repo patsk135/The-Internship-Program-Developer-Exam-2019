@@ -1,0 +1,5 @@
+Australia::Hint::Kangaroo
+America::Hint::Donald Trump
+Asia::Hint::Mathematical Genius
+Europe::Hint::Second smallest continent
+Africa::Hint::Sahara

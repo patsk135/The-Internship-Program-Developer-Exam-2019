@@ -5,7 +5,6 @@ const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
-let state = "Start";
 
 console.log("Input File Name: (Example.txt)");
 

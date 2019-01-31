@@ -1,11 +1,27 @@
-import java.util.*;
+import java.util.Scanner;
 import java.util.stream.IntStream;
+import java.util.List;
+import java.util.ArrayList;
 import java.io.File;
 import java.io.FilenameFilter;
 
 public class Hangman {
-    public static void main(String[] args) throws Exception {
-        Scanner kb = new Scanner(System.in);
+    private static final Scanner kb = new Scanner(System.in);
+    public static void main(String[] args) {
+        try {
+            String catagory = chooseCatagory();
+            String[] wordWithHint = randomWord(catagory);
+            String word = wordWithHint[0];
+            String hint = wordWithHint[1];
+            System.out.println("\nHint: " + hint + "\n");
+            startGuessing(word);
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+        
+    }
+
+    private static String chooseCatagory() {
         File folder = new File("./");
         String[] listOfFiles = folder.list(new FilenameFilter() {
 
@@ -15,68 +31,86 @@ public class Hangman {
             }
         });
 
-        System.out.println("Select Catagory: ");
-        for (String file : listOfFiles) {
-            System.out.println(file.substring(0, file.lastIndexOf(".")));
+        System.out.println("Select Catagory (Number of the catagory): ");
+        for (int i = 0; i < listOfFiles.length; i++) {
+            System.out.println((i+1) + ". " + listOfFiles[i].substring(0, listOfFiles[i].lastIndexOf(".")));
         }
         int catagory = kb.nextInt();
+        return listOfFiles[catagory - 1];
+    }
 
-        System.out.println(listOfFiles[catagory - 1]);
-        Scanner fileReader = new Scanner(new File(listOfFiles[catagory - 1]));
+    private static String[] randomWord(String catagory) throws Exception {
+        Scanner fr = new Scanner(new File(catagory));
         List<String> words = new ArrayList<String>();
-        while (fileReader.hasNextLine()) {
-            words.add(fileReader.nextLine());
+        while (fr.hasNextLine()) {
+            words.add(fr.nextLine());
         }
-        int ran = (int) (Math.random() * 6 - 1);
-        String[] word = words.get(ran).split("::Hint::");
-        int[] check = new int[word[0].length()];
+        int random = (int) (Math.random() * words.size());
+        String[] wordWithHint = words.get(random).split("::Hint::");
+        fr.close();
+        return wordWithHint;
+    }
+
+    private static void startGuessing(String word) {
+        char[] playerWord = initPlayerWord(word);
         int score = 0;
-        int remain = 10;
-        String wrong = "";
-        if (word.length > 1) {
-            System.out.println("\nHint: " + word[1] + "\n");
-        }
-        while (IntStream.of(check).anyMatch(x -> x == 0)) {
-            for (int i = 0; i < word[0].length(); i++) {
-                if (check[i] == 1 || !(Character.toLowerCase(word[0].charAt(i)) >= 'a'
-                        && Character.toLowerCase(word[0].charAt(i)) <= 'z')) {
-                    check[i] = 1;
-                    System.out.print(word[0].charAt(i) + " ");
-                } else {
-                    System.out.print("_ ");
-                }
+        int remainingWrongGuess = 10;
+        String wrongGuess = "";
+
+        while(true) {
+            if(isPlayerWin(playerWord)) {
+                System.out.println("Answer: " + word + "\nYou Win!");
+                break;
+            } else if(remainingWrongGuess == -1) {
+                System.out.println("Answer: " + word + "\nYou Lose!");
+                break;
             }
-            System.out.print("Score " + score + ", remaining wrong guess " + remain);
-            if (!wrong.equals("")) {
-                System.out.print(", wrong guessed: " + wrong);
-            }
-            System.out.println();
-            char guessWord = Character.toLowerCase(kb.next().charAt(0));
-            if(wrong.indexOf(guessWord) != -1){
-                System.out.println("Repeated Answer!");
-                continue;
-            }
-            if (word[0].toLowerCase().indexOf(guessWord) == -1) {
-                wrong += guessWord + " ";
-                remain--;
-                if(remain == -1) {
-                    break;
-                }
+            printCurrentGuessedWord(playerWord, score, remainingWrongGuess, wrongGuess);
+            System.out.println("Guess a Character: ");
+            char guessedChar = kb.next().charAt(0);
+            int indexOfGuessedChar = word.toLowerCase().indexOf(guessedChar);
+            if(wrongGuess.indexOf(guessedChar) != -1) {
+                System.out.println("Repeated Wrong Guessed.");
+            } else if(indexOfGuessedChar == -1) {
+                remainingWrongGuess--;
+                wrongGuess += guessedChar + " ";
+            } else if(playerWord[indexOfGuessedChar] != '_') {
+                System.out.println("Repeated Guessed.");
             } else {
-                for (int i = 0; i < word[0].length(); i++) {
-                    if (word[0].toLowerCase().charAt(i) == guessWord && check[i] == 0) {
-                        check[i] = 1;
-                        score += 10;
+                score += 10;
+                for(int i = 0; i < word.length(); i++){
+                    if(word.toLowerCase().charAt(i) == guessedChar) {
+                        playerWord[i] = word.charAt(i);
                     }
                 }
             }
         }
-        if(remain == -1){
-            System.out.println("Answer: " + word[0] + "You Lose!");
-        }
-        System.out.println("Answer: " + word[0] + "\nYou Win!");
+    }
 
-        kb.close();
-        fileReader.close();
+    private static char[] initPlayerWord(String word) {
+        char[] playerWord = word.toCharArray();
+        for(int i = 0; i < playerWord.length; i++) {
+            if(Character.isLetter(playerWord[i])) {
+                playerWord[i] = '_';
+            }
+        }
+        return playerWord;
+    }
+
+    private static boolean isPlayerWin(char[] currentGuessed) {
+        boolean containUnknownChar = false;
+        for(char c : currentGuessed) {
+            if(c == '_') {
+                containUnknownChar = true;
+            }
+        }
+        return !containUnknownChar;
+    }
+
+    private static void printCurrentGuessedWord(char[] playerWord, int score, int remainingWrongGuess, String wrongGuess) {
+        for(int i = 0; i < playerWord.length; i++) {
+            System.out.print(playerWord[i] + " ");
+        }
+        System.out.println("  score " + score + ", remaining wrong guess " + remainingWrongGuess + ", wrong guessed: " + wrongGuess);
     }
 }

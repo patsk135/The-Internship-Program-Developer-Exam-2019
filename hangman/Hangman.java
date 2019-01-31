@@ -67,7 +67,7 @@ public class Hangman {
             }
             printCurrentGuessedWord(playerWord, score, remainingWrongGuess, wrongGuess);
             System.out.println("Guess a Character: ");
-            char guessedChar = kb.next().charAt(0);
+            char guessedChar = Character.toLowerCase(kb.next().charAt(0));
             int indexOfGuessedChar = word.toLowerCase().indexOf(guessedChar);
             if(wrongGuess.indexOf(guessedChar) != -1) {
                 System.out.println("Repeated Wrong Guessed.");

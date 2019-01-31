@@ -2,7 +2,7 @@
 
 ## Personal Information
 
-- Name: Anapat Jiamwijitkul
+- Name: Anapat Jiamwijitkul / อนพัช เจียมวิจิตรกุล
 
 - Email: pat_sk135@hotmail.com
 

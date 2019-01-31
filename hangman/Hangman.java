@@ -22,7 +22,7 @@ public class Hangman {
     }
 
     private static String chooseCatagory() {
-        File folder = new File("./");
+        File folder = new File("./categories");
         String[] listOfFiles = folder.list(new FilenameFilter() {
 
             @Override
@@ -40,7 +40,7 @@ public class Hangman {
     }
 
     private static String[] randomWord(String catagory) throws Exception {
-        Scanner fr = new Scanner(new File(catagory));
+        Scanner fr = new Scanner(new File("./categories/" + catagory));
         List<String> words = new ArrayList<String>();
         while (fr.hasNextLine()) {
             words.add(fr.nextLine());
@@ -59,7 +59,7 @@ public class Hangman {
 
         while(true) {
             if(isPlayerWin(playerWord)) {
-                System.out.println("Answer: " + word + "\nYou Win!");
+                System.out.println("Answer: " + word + "\nYou Win! Your score is " + score + "!");
                 break;
             } else if(remainingWrongGuess == -1) {
                 System.out.println("Answer: " + word + "\nYou Lose!");

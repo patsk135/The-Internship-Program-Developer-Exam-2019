@@ -6,7 +6,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-console.log("Input File Name: (Example.txt)");
+console.log("Input File Name: (Example.xml)");
 
 rl.on("line", line => {
   convertXmlToJson(line);
@@ -16,15 +16,15 @@ const convertXmlToJson = fileName => {
   fs.readFile(__dirname + "/" + fileName, (err, data) => {
     if (err) {
       console.log(err);
-    }
-    const s = data.toString();
-    const pattern = /"([^"]*)"/g;
-    const o = s.match(pattern);
-    const country = s.substring(
-      s.indexOf("<country>") + 9,
-      s.indexOf("</country>")
-    );
-    const jsonWeather = 
+    } else {
+      const s = data.toString();
+      const pattern = /"([^"]*)"/g;
+      const o = s.match(pattern);
+      const country = s.substring(
+        s.indexOf("<country>") + 9,
+        s.indexOf("</country>")
+      );
+      const jsonWeather = 
 `{
   "city": {
     "id": ${o[2]},
@@ -83,13 +83,14 @@ const convertXmlToJson = fileName => {
     "value": ${o[28]}
   }
 }`;
-    fs.writeFile(
-      __dirname + "/" + fileName.substring(0, fileName.indexOf(".")) + ".json",
-      jsonWeather,
-      () => {
-        console.log("File Converter from XML to JSON: Success!");
-        process.stdin.destroy();
-      }
-    );
+      fs.writeFile(
+        __dirname + "/" + fileName.substring(0, fileName.indexOf(".")) + ".json",
+        jsonWeather,
+        () => {
+          console.log("File Converter from XML to JSON: Success!");
+          process.stdin.destroy();
+        }
+      );
+    }
   });
 };
